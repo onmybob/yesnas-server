@@ -1,0 +1,9 @@
+.cm-editor {
+  border: none;
+}
+.cm-editor.cm-focused {
+  border: none;
+}
+.cm-editor.cm-focused {
+  outline: "none";
+}

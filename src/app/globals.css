@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+@layer base {
+  html,
+  body {
+    padding: 0;
+    margin: 0;
+  }
+  h4 {
+    font-weight: bold;
+    font-size: 0.975rem;
+  }
+  h5 {
+    font-size: 0.875rem;
+  }
+  h2 {
+    font-weight: bold;
+    font-size: 1.25rem;
+  }
+  h1 {
+    font-weight: bold;
+    font-size: 1.45rem;
+  }
+}
+@layer components {
+  /* HTML: <div class="loader"></div> */
+  /* HTML: <div class="loader"></div> */
+  /* HTML: <div class="loader"></div> */
+  /* HTML: <div class="loader"></div> */
+  .loader {
+    width: 88px;
+    height: 13px;
+    -webkit-mask: linear-gradient(90deg, #777 70%, #0000 0) left/20% 100%;
+    background: linear-gradient(#777 0 0) left -25% top 0 /20% 100% no-repeat #ddd;
+    animation: l7 1s infinite steps(6);
+  }
+  .bg-bar {
+    background: green;
+  }
+  @keyframes l7 {
+    100% {
+      background-position: right -25% top 0;
+    }
+  }
+}
