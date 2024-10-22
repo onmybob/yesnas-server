@@ -58,7 +58,7 @@ class httpRequest {
    */
   static async staticFetch(url = "", options: any = {}, loading: boolean) {
     const defaultOptions = {
-      credentials: "include",
+      // credentials: "include",
       mode: "cors",
       headers: {
         token: null,
