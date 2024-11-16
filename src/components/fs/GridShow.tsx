@@ -5,13 +5,13 @@ import Dialogs from "@/components/ui/dialogs";
 import useClickOutside from "@/hooks/useClickOutside";
 import { REGEX_FILENAME } from "@/libs/regex";
 import { cn } from "@/libs/utils";
-import { readCode, recycleBin, renameFile, saveCode } from "@/service/fs";
+import { readCode, recycleBin, renameFile, saveCode, transfer } from "@/service/fs";
 import { useStore } from "@/store";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { Menu, MenuButton, MenuItem } from "@szhsin/react-menu";
 import dayjs from "dayjs";
 import { useTranslations } from "next-intl";
-import React, { memo, useCallback, useMemo, useRef, useState } from "react";
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { MdOutlineEditNote } from "react-icons/md";
@@ -41,12 +41,13 @@ const GridShow = ({ data, dev, currentPath, updateData }: Props) => {
   const buttonRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [selectedIndices, setSelectedIndices] = useState<string[]>([]);
   const [dataRender, setDataRender] = useState<Record<string, any>[]>([]);
-
   const [currentItem, setCurrentItem] = useState<Record<string, any> | null>(null);
   const [code, setCode] = useState<string>("");
-
+  const [transferDev, setTransferDev] = useState<Dev | null>(null);
+  const [transferPath, setTransferPath] = useState("");
+  const [eventSource, setEventSource] = useState<EventSource | null>(null); // 用于存储 EventSource 实例
+  const [transferMsg, setTransferMsg] = useState();
   const [icons, setIcons] = useState<any[]>([]);
-
   const inputRef = useRef<HTMLInputElement>(null);
   const [inputValue, setInputValue] = useState<string>("");
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,6 +91,8 @@ const GridShow = ({ data, dev, currentPath, updateData }: Props) => {
     setCurrentItem(item);
   };
   const copyClick = async (item: Record<string, any>) => {
+    setTransferDev(null);
+    setTransferPath("");
     setModalState((prev) => ({ ...prev, copy: true }));
     setCurrentItem(item);
   };
@@ -98,9 +101,34 @@ const GridShow = ({ data, dev, currentPath, updateData }: Props) => {
     setCurrentItem(item);
   };
 
-  const callCopy = async () => {
-    alert(10);
+  const handleCopy = async () => {
+    const paths = [{ path: currentItem?.file_path + currentItem?.filename, is_dir: currentItem?.is_dir }];
+
+    selectedIndices.forEach((filename) => {
+      if (currentItem?.filename !== filename) {
+        data.map((item: File) => {
+          if (item.filename == filename) {
+            paths.push({ path: currentItem?.file_path + filename, is_dir: item.is_dir });
+          }
+        });
+      }
+    });
+
+    const jsonStr = { src_dev_id: dev.id, paths: paths, dest_dev_id: transferDev?.id, dest_path: transferPath };
+    // const newEventSource = new EventSource("/api/sse/fs/copymove?data=" + JSON.stringify(jsonStr));
+
+    // newEventSource.onmessage = (event) => {
+    //   const data = JSON.parse(event.data);
+    //   console.log(data);
+    //   setTransferMsg(event.data);
+    // };
+    // setEventSource(newEventSource); // 保存 EventSource 实例
+
+    // getNotification("copy", "running");
+
+    await transfer(dev.id, { paths: paths, dest_dev_id: transferDev?.id, dest_path: transferPath });
   };
+
   const handleSelClick = (event: React.MouseEvent, item: Record<string, any>) => {
     const target = event.target as HTMLElement;
     const menuButton = target.closest(".operator");
@@ -203,6 +231,14 @@ const GridShow = ({ data, dev, currentPath, updateData }: Props) => {
     setModalState((prev) => ({ ...prev, editor: false }));
   };
 
+  useEffect(() => {
+    return () => {
+      if (eventSource) {
+        eventSource.close();
+        setEventSource(null);
+      }
+    };
+  }, []);
   // useEffect(() => {
   //   if (inputRef.current && renameModal) {
   //     if (inputValue.indexOf(".") > -1) {
@@ -266,8 +302,21 @@ const GridShow = ({ data, dev, currentPath, updateData }: Props) => {
         />
       </Dialogs>
 
-      <Dialogs open={modalState.copy} confirmBtn={t("next")} cancelBtn={t("cancel")} onClose={() => setModalState((prev) => ({ ...prev, copy: false }))} onConfirm={callCopy}>
-        <Transfer />
+      <Dialogs
+        noClass={true}
+        open={modalState.copy}
+        {...(transferDev ? { confirmBtn: t("copy_here") } : {})}
+        cancelBtn={t("cancel")}
+        onClose={() => {
+          setModalState((prev) => ({ ...prev, copy: false }));
+          if (eventSource) {
+            eventSource.close();
+            setEventSource(null);
+          }
+        }}
+        onConfirm={handleCopy}
+      >
+        <Transfer file={currentItem} length={selectedIndices.length} setTransferDev={setTransferDev} setTransferPath={setTransferPath} />
       </Dialogs>
 
       {dataRender.map((item, index) => (
@@ -277,7 +326,7 @@ const GridShow = ({ data, dev, currentPath, updateData }: Props) => {
           ref={(el) => {
             buttonRefs.current[index] = el;
           }}
-          className={cn("group mr-2 h-36 w-32 cursor-pointer text-center hover:bg-gray-50", selectedIndices.includes(item.filename) ? "bg-gray-50" : "")}
+          className={cn("group mb-2 mr-2 h-36 w-32 cursor-pointer text-center hover:bg-gray-50", selectedIndices.includes(item.filename) ? "bg-gray-50" : "")}
         >
           <div className="flex flex-col items-center justify-between">
             <div

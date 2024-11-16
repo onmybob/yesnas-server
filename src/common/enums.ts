@@ -19,3 +19,13 @@ export enum ShowKind {
   LIST,
   GRID,
 }
+export enum TransferStatus {
+  INIT,
+  RUNNING,
+  FAIL,
+  COMPLETED,
+}
+export enum TransferAction {
+  COPY,
+  MOVE,
+}

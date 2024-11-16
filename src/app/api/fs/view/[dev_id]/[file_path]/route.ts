@@ -1,6 +1,6 @@
 import { Dev } from "@/common/models/fs";
-import db from "@/libs/pouchDB";
 import { compressImage } from "@/libs/serverUtils";
+import db from "@/libs/sqlite3";
 import { NextRequest, NextResponse } from "next/server";
 import fs from "node:fs/promises";
 import path from "path";

@@ -6,11 +6,12 @@ import { del, get, post, put, upload } from "@/libs/httpRequest";
  *
  * @param devId - The name of the device where the files are located (e.g., storage pool, network storage).
  * @param path - The directory path from which to retrieve the files.
+ * @param type --  0 all 1 directory
  * @returns A promise that resolves to the result of the API call.
  */
-export const getDir = async (devId: string, path: string) => {
+export const getDir = async (devId: string, path: string, type: number) => {
   const file_path = encodeURIComponent(path);
-  return get(`${API_BASE_URL}/fs/${devId}/${file_path}`);
+  return get(`${API_BASE_URL}/fs/${devId}/${file_path}/${type}`);
 };
 
 /**
@@ -27,6 +28,7 @@ export const getDir = async (devId: string, path: string) => {
 export const createFile = async (devId: string, path: string, name: string, type: number) => {
   const newPath = encodeURIComponent(path + name);
   const url = `${API_BASE_URL}/fs/${devId}/${newPath}`;
+
   post(url, { type: type });
 };
 
@@ -40,13 +42,16 @@ export const renameFile = async (devId: string, oldFilePath: string, nweName: st
 };
 /**
  * Delte filename or directory
-
  */
 export const recycleBin = async (devId: string, data: Record<string, any>) => {
   const url = `${API_BASE_URL}/fs/${devId}`;
   return del(url, data);
 };
-
+//devId: src devId
+export const transfer = async (devId: string, data: Record<string, any>) => {
+  const url = `${API_BASE_URL}/fs/${devId}`;
+  return post(url, data);
+};
 export const readCode = async (devId: string, filePath: string, fileName: string) => {
   filePath = encodeURIComponent(filePath);
   const url = `${API_BASE_URL}/fs/${devId}/${filePath}/${fileName}`;
@@ -56,4 +61,9 @@ export const readCode = async (devId: string, filePath: string, fileName: string
 export const saveCode = async (formData: FormData) => {
   const url = `${API_BASE_URL}/fs/upload`;
   return upload(url, formData);
+};
+
+export const getNotification = (action: string, status: string) => {
+  // const list: transferNotification[] = db.prepare("SELECT * FROM transfer where action = ? and status = ?").get(action, status);
+  // console.log(list);
 };

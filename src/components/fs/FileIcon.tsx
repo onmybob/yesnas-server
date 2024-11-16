@@ -9,7 +9,7 @@ import { IconType } from "react-icons";
 import { FaFileAlt } from "react-icons/fa";
 import { getIconMap } from "./Icons";
 
-const FileIcon = ({ filename, devId }: { filename: string; devId: string }) => {
+const FileIcon = ({ filename, devId, className, loadingImg = true }: { loadingImg?: boolean; filename: string; devId: string; className?: string }) => {
   const fsCurrentPathList = useStore((state) => state.fsCurrentPathList);
   let file_path = fsCurrentPathList.join("/").replace(/\/+/g, "/");
   if (!file_path.endsWith("/")) {
@@ -25,7 +25,7 @@ const FileIcon = ({ filename, devId }: { filename: string; devId: string }) => {
   const type = getType(filename);
 
   useEffect(() => {
-    if (["png", "jpg", "jpeg", "gif"].includes(type)) {
+    if (loadingImg && ["png", "jpg", "jpeg", "gif"].includes(type)) {
       const fetchData = async () => {
         try {
           const param = encodeURIComponent(file_path + filename);
@@ -59,7 +59,7 @@ const FileIcon = ({ filename, devId }: { filename: string; devId: string }) => {
       ) : (
         <>
           {React.createElement(iconMap.icon, {
-            className: clsx("h-8 w-8"),
+            className: className ? clsx(className) : clsx("h-8 w-8"),
             style: {
               color: iconMap.color,
             },

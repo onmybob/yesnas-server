@@ -118,6 +118,7 @@ export const Upload = ({ path, updateData, createFolder }: { path: string; updat
 
   //monitor button click on the layout
   useEffect(() => {
+    alert("s");
     if (fsAction == UploadAction.UPLOAD_DIR) {
       handleDirectoryClick();
     } else if (fsAction == UploadAction.UPLOAD_FILE) {

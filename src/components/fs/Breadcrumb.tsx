@@ -23,7 +23,7 @@ export const Breadcrumb = () => {
         (path, index) =>
           path !== "/" && (
             <div key={index} className="flex flex-row gap-1">
-              <div>/</div>
+              <div className="text-gray-400">/</div>
               <span>
                 <button onClick={() => updateCurrentPathCut(index)}>{path}</button>
               </span>

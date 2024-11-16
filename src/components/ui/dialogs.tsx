@@ -14,9 +14,10 @@ interface Props {
   onConfirm: () => void;
   children: React.ReactNode;
   icon?: any;
+  noClass?: boolean;
 }
 
-export default function Dialogs({ icon, open, onClose, title, confirmBtn, cancelBtn, onCancel, onConfirm, children }: Props) {
+export default function Dialogs({ icon, open, onClose, title, confirmBtn, cancelBtn, onCancel, onConfirm, children, noClass }: Props) {
   const [show, setShow] = useState(false);
   useEffect(() => {
     setShow(open);
@@ -41,7 +42,7 @@ export default function Dialogs({ icon, open, onClose, title, confirmBtn, cancel
             transition
             className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-[closed]:translate-y-4 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 data-[closed]:sm:translate-y-0 data-[closed]:sm:scale-95"
           >
-            <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+            <div className={cn("bg-white", !noClass ? "px-4 pb-4 pt-5 sm:p-6 sm:pb-4" : "")}>
               <div className="sm:flex sm:items-start">
                 {icon && (
                   <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
@@ -58,14 +59,16 @@ export default function Dialogs({ icon, open, onClose, title, confirmBtn, cancel
                 </div>
               </div>
             </div>
-            <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-              <button
-                type="button"
-                onClick={onConfirm}
-                className="inline-flex w-full justify-center rounded-sm bg-gray-950 px-3 py-2 text-sm text-white shadow-sm hover:bg-gray-800 sm:ml-3 sm:w-auto"
-              >
-                {confirmBtn ? confirmBtn : "确认"}
-              </button>
+            <div className="flex flex-row justify-end gap-2 bg-gray-50 px-6 py-3">
+              {confirmBtn && (
+                <button
+                  type="button"
+                  onClick={onConfirm}
+                  className="inline-flex w-full justify-center rounded-sm bg-gray-950 px-3 py-2 text-sm text-white shadow-sm hover:bg-gray-800 sm:ml-3 sm:w-auto"
+                >
+                  {confirmBtn ? confirmBtn : "确认"}
+                </button>
+              )}
               <button
                 type="button"
                 onClick={onCancel ? onCancel : handleClose}

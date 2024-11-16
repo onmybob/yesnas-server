@@ -14,3 +14,17 @@ export interface Dev {
   used_space: number;
   location: string;
 }
+export interface TransferNotification {
+  id: string;
+  action: string;
+  src_dir: string;
+  dest_dir: string;
+  progress: number;
+  is_dir: number;
+  src_dev_id: string;
+  status: string;
+  msg: string;
+  speed: string;
+  create_time: string;
+  end_time: string;
+}
